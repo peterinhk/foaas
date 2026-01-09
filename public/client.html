@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOAAS Operations Client</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 20px; color: #333; }
+        h1 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #f8f8f8; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .param-row { margin-bottom: 8px; }
+        .param-row label { display: inline-block; width: 100px; font-weight: 500; }
+        .param-row input { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
+        a.api-link { color: #007bff; text-decoration: none; word-break: break-all; font-family: monospace; }
+        a.api-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>FOAAS Operations Client</h1>
+    <p>Test the Fuck Off As A Service API operations below.</p>
+
+    <table id="ops-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Function Name</th>
+                <th style="width: 30%;">Message Template</th>
+                <th style="width: 25%;">Parameters</th>
+                <th style="width: 25%;">Generated URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="4">Loading operations...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        var operations = [
+                {
+                    "name": "Absolutely fucking not",
+                    "url": "/absolutely/:name/:from",
+                    "function_name": "absolutely",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Absolutely fucking Not, :company, No Fucking Way!"
+                },
+                {
+                    "name": "Who the fuck are you anyway",
+                    "url": "/anyway/:name/:from",
+                    "function_name": "anyway",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Who the fuck are you anyway, :company, why are you stirring up so much trouble, and, who pays you?"
+                },
+                {
+                    "name": "Asshole",
+                    "url": "/asshole/:from",
+                    "function_name": "asshole",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you, asshole."
+                },
+                {
+                    "name": "Awesome",
+                    "url": "/awesome/:from",
+                    "function_name": "awesome",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "This is Fucking Awesome."
+                },
+                {
+                    "name": "Back the fuck off",
+                    "url": "/back/:name/:from",
+                    "function_name": "back",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, back the fuck off."
+                },
+                {
+                    "name": "Bag",
+                    "url": "/bag/:from",
+                    "function_name": "bag",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Eat a bag of fucking dicks."
+                },
+                {
+                    "name": "Ballmer",
+                    "url": "/ballmer/:name/:name/:from",
+                    "function_name": "ballmer",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fucking :name is a fucking pussy. I'm going to fucking bury that guy, I have done it before, and I will do it again. I'm going to fucking kill :company."
+                },
+                {
+                    "name": "Bday",
+                    "url": "/bday/:name/:from",
+                    "function_name": "bday",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Happy Fucking Birthday, :name."
+                },
+                {
+                    "name": "Because",
+                    "url": "/because/:from",
+                    "function_name": "because",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Why? Because fuck you, that's why."
+                },
+                {
+                    "name": "Blackadder",
+                    "url": "/blackadder/:name/:from",
+                    "function_name": "blackadder",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, your head is as empty as a eunuch’s underpants. Fuck off!"
+                },
+                {
+                    "name": "Bravo Mike",
+                    "url": "/bm/:name/:from",
+                    "function_name": "bm",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Bravo mike, :name."
+                },
+                {
+                    "name": "Bucket",
+                    "url": "/bucket/:from",
+                    "function_name": "bucket",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Please choke on a bucket of cocks."
+                },
+                {
+                    "name": "Bus",
+                    "url": "/bus/:name/:from",
+                    "function_name": "bus",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Christ on a bendy-bus, :name, don't be such a fucking faff-arse."
+                },
+                {
+                    "name": "Bye",
+                    "url": "/bye/:from",
+                    "function_name": "bye",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuckity bye!"
+                },
+                {
+                    "name": "Can I Use",
+                    "url": "/caniuse/:tool/:from",
+                    "function_name": "caniuse",
+                    "parameters": [
+                        { "name": "Tool", "field": "tool" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Can you use :tool? Fuck no!"
+                },
+                {
+                    "name": "Chainsaw",
+                    "url": "/chainsaw/:name/:from",
+                    "function_name": "chainsaw",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck me gently with a chainsaw, :name. Do I look like Mother Teresa?"
+                },
+                {
+                    "name": "Check your fucking logs!",
+                    "url": "/logs/:from",
+                    "function_name": "logs",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Check your fucking logs!"
+                },
+                {
+                    "name": "Cocksplat",
+                    "url": "/cocksplat/:name/:from",
+                    "function_name": "cocksplat",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck off :name, you worthless cocksplat"
+                },
+                {
+                    "name": "Cool Story",
+                    "url": "/cool/:from",
+                    "function_name": "cool",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Cool story, bro."
+                },
+                {
+                    "name": "Cup",
+                    "url": "/cup/:from",
+                    "function_name": "cup",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "How about a nice cup of shut the fuck up?"
+                },
+                {
+                    "name": "Dalton",
+                    "url": "/dalton/:name/:from",
+                    "function_name": "dalton",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name: A fucking problem solving super-hero."
+                },
+                {
+                    "name": "Dense",
+                    "url": "/dense/:from",
+                    "function_name": "dense",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "You disingenuous dense motherfucker!"
+                },
+                {
+                    "name": "{name} you are being the usual slimy hypocritical asshole... You may have had value ten years ago, but people will see that you don't anymore.",
+                    "url": "/deraadt/:name/:from",
+                    "function_name": "deraadt",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name you are being the usual slimy hypocritical asshole... You may have had value ten years ago, but people will see that you don't anymore."
+                },
+                {
+                    "name": "Diabetes",
+                    "url": "/diabetes/:from",
+                    "function_name": "diabetes",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I'd love to stop and chat to you but I'd rather have type 2 diabetes."
+                },
+                {
+                    "name": "Disappoint Fewer People",
+                    "url": "/fewer/:name/:from",
+                    "function_name": "fewer",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Go fuck yourself :name, you'll disappoint fewer people."
+                },
+                {
+                    "name": "Do Something",
+                    "url": "/dosomething/:do/:something/:from",
+                    "function_name": "dosomething",
+                    "parameters": [
+                        { "name": "Do", "field": "do" },
+                        { "name": "Something", "field": "something" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":do the fucking :something!"
+                },
+                {
+                    "name": "Donut",
+                    "url": "/donut/:name/:from",
+                    "function_name": "donut",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, go and take a flying fuck at a rolling donut."
+                },
+                {
+                    "name": "Dumbledore",
+                    "url": "/dumbledore/:from",
+                    "function_name": "dumbledore",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Happiness can be found, even in the darkest of times, if one only remembers to fuck off."
+                },
+                {
+                    "name": "Equity",
+                    "url": "/equity/:name/:from",
+                    "function_name": "equity",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Equity only? Long hours? Zero Pay? Well :name, just sign me right the fuck up."
+                },
+                {
+                    "name": "Even",
+                    "url": "/even/:from",
+                    "function_name": "even",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I can't fuckin' even."
+                },
+                {
+                    "name": "Everyone",
+                    "url": "/everyone/:from",
+                    "function_name": "everyone",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Everyone can go and fuck off."
+                },
+                {
+                    "name": "Everything",
+                    "url": "/everything/:from",
+                    "function_name": "everything",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck everything."
+                },
+                {
+                    "name": "Family",
+                    "url": "/family/:from",
+                    "function_name": "family",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you, your whole family, your pets, and your feces."
+                },
+                {
+                    "name": "Fascinating",
+                    "url": "/fascinating/:from",
+                    "function_name": "fascinating",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fascinating story, in what chapter do you shut the fuck up?"
+                },
+                {
+                    "name": "Field of Fucks",
+                    "url": "/field/:name/:from/:reference",
+                    "function_name": "field",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" },
+                        { "name": "Reference", "field": "reference" }
+                    ],
+                    "message": "And :name said unto :from, 'Verily, cast thine eyes upon the field in which I grow my fucks', and :from gave witness unto the field, and saw that it was barren."
+                },
+                {
+                    "name": "Flying",
+                    "url": "/flying/:from",
+                    "function_name": "flying",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I don't give a flying fuck."
+                },
+                {
+                    "name": "Fuck Me",
+                    "url": "/me/:from",
+                    "function_name": "me",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck me."
+                },
+                {
+                    "name": "Fuck Off",
+                    "url": "/off/:name/:from",
+                    "function_name": "off",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck off, :name."
+                },
+                {
+                    "name": "Fuck Off With",
+                    "url": "/off-with/:behavior/:from",
+                    "function_name": "off-with",
+                    "parameters": [
+                        { "name": "Behavior", "field": "behavior" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck off with :behavior"
+                },
+                {
+                    "name": "Fuck That",
+                    "url": "/that/:from",
+                    "function_name": "that",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck that."
+                },
+                {
+                    "name": "Fuck That Shit",
+                    "url": "/fts/:name/:from",
+                    "function_name": "fts",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck that shit, :name."
+                },
+                {
+                    "name": "Fuck That, Fuck You",
+                    "url": "/ftfy/:from",
+                    "function_name": "ftfy",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck That, Fuck You"
+                },
+                {
+                    "name": "Fuck This",
+                    "url": "/this/:from",
+                    "function_name": "this",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck this."
+                },
+                {
+                    "name": "Fuck This Shit",
+                    "url": "/shit/:from",
+                    "function_name": "shit",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck this shit!"
+                },
+                {
+                    "name": "Fuck You",
+                    "url": "/you/:name/:from",
+                    "function_name": "you",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck you, :name."
+                },
+                {
+                    "name": "Fuck you and the horse you rode in on",
+                    "url": "/horse/:from",
+                    "function_name": "horse",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you and the horse you rode in on."
+                },
+                {
+                    "name": "Fucking",
+                    "url": "/ing/:name/:from",
+                    "function_name": "ing",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fucking fuck off, :name."
+                },
+                {
+                    "name": "FYYFF",
+                    "url": "/fyyff/:from",
+                    "function_name": "fyyff",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you, you fucking fuck."
+                },
+                {
+                    "name": "Give",
+                    "url": "/give/:from",
+                    "function_name": "give",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I give zero fucks."
+                },
+                {
+                    "name": "Golf Foxtrot Yankee",
+                    "url": "/gfy/:name/:from",
+                    "function_name": "gfy",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Golf foxtrot yankee, :name."
+                },
+                {
+                    "name": "Greed",
+                    "url": "/greed/:noun/:from",
+                    "function_name": "greed",
+                    "parameters": [
+                        { "name": "Noun", "field": "noun" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "The point is, ladies and gentleman, that :noun -- for lack of a better word -- is good. :noun is right. :noun works. :noun clarifies, cuts through, and captures the essence of the evolutionary spirit. :noun, in all of its forms -- :noun for life, for money, for love, knowledge -- has marked the upward surge of mankind."
+                },
+                {
+                    "name": "Holygrail",
+                    "url": "/holygrail/:from",
+                    "function_name": "holygrail",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I don't want to talk to you, no more, you empty-headed animal, food trough wiper. I fart in your general direction. Your mother was a hamster and your father smelt of elderberries. Now go away or I shall taunt you a second time."
+                },
+                {
+                    "name": "Idea",
+                    "url": "/idea/:from",
+                    "function_name": "idea",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "That sounds like a fucking great idea!"
+                },
+                {
+                    "name": "Immensity",
+                    "url": "/immensity/:from",
+                    "function_name": "immensity",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "You can not imagine the immensity of the FUCK I do not give."
+                },
+                {
+                    "name": "Jingle Bells",
+                    "url": "/jinglebells/:from",
+                    "function_name": "jinglebells",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you, fuck me, fuck your family. Fuck your father, fuck your mother, fuck you and me."
+                },
+                {
+                    "name": "Keep",
+                    "url": "/keep/:name/:from",
+                    "function_name": "keep",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name: Fuck off. And when you get there, fuck off from there too. Then fuck off some more. Keep fucking off until you get back here. Then fuck off again."
+                },
+                {
+                    "name": "Keep Calm",
+                    "url": "/keepcalm/:reaction/:from",
+                    "function_name": "keepcalm",
+                    "parameters": [
+                        { "name": "Reaction", "field": "reaction" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Keep the fuck calm and :reaction!"
+                },
+                {
+                    "name": "King",
+                    "url": "/king/:name/:from",
+                    "function_name": "king",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Oh fuck off, just really fuck off you total dickface. Christ, :name, you are fucking thick."
+                },
+                {
+                    "name": "Legend",
+                    "url": "/legend/:name/:from",
+                    "function_name": "legend",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, you're a fucking legend."
+                },
+                {
+                    "name": "Life",
+                    "url": "/life/:from",
+                    "function_name": "life",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck my life."
+                },
+                {
+                    "name": "Linus",
+                    "url": "/linus/:name/:from",
+                    "function_name": "linus",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, there aren't enough swear-words in the English language, so now I'll have to call you perkeleen vittupää just to express my disgust and frustration with this crap."
+                },
+                {
+                    "name": "Look",
+                    "url": "/look/:name/:from",
+                    "function_name": "look",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, do I look like I give a fuck?"
+                },
+                {
+                    "name": "Looking",
+                    "url": "/looking/:from",
+                    "function_name": "looking",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Looking for a fuck to give."
+                },
+                {
+                    "name": "LowPoly",
+                    "url": "/lowpoly/:from",
+                    "function_name": "lowpoly",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "You low polygon motherfucker!"
+                },
+                {
+                    "name": "Madison",
+                    "url": "/madison/:name/:from",
+                    "function_name": "madison",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "What you've just said is one of the most insanely idiotic things I have ever heard, :name. At no point in your rambling, incoherent response were you even close to anything that could be considered a rational thought. Everyone in this room is now dumber for having listened to it. I award you no points :name, and may God have mercy on your soul."
+                },
+                {
+                    "name": "Maybe",
+                    "url": "/maybe/:from",
+                    "function_name": "maybe",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Maybe. Maybe not. Maybe fuck yourself."
+                },
+                {
+                    "name": "mornin",
+                    "url": "/mornin/:from",
+                    "function_name": "mornin",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Happy fuckin' mornin'!"
+                },
+                {
+                    "name": "No",
+                    "url": "/no/:from",
+                    "function_name": "no",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "No fucks given."
+                },
+                {
+                    "name": "Nugget",
+                    "url": "/nugget/:name/:from",
+                    "function_name": "nugget",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Well :name, aren't you a shining example of a rancid fuck-nugget."
+                },
+                {
+                    "name": "Outside",
+                    "url": "/outside/:name/:from",
+                    "function_name": "outside",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, why don't you go outside and play hide-and-go-fuck-yourself?"
+                },
+                {
+                    "name": "Pink",
+                    "url": "/pink/:from",
+                    "function_name": "pink",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Well, fuck me pink."
+                },
+                {
+                    "name": "Problem",
+                    "url": "/problem/:name/:from",
+                    "function_name": "problem",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "What the fuck is your problem :name?"
+                },
+                {
+                    "name": "Programmer",
+                    "url": "/programmer/:from",
+                    "function_name": "programmer",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you, I'm a programmer, bitch!"
+                },
+                {
+                    "name": "Pulp",
+                    "url": "/pulp/:language/:from",
+                    "function_name": "pulp",
+                    "parameters": [
+                        { "name": "Language", "field": "language" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":language, motherfucker, do you speak it?"
+                },
+                {
+                    "name": "Question",
+                    "url": "/question/:from",
+                    "function_name": "question",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "To fuck off, or to fuck off (that is not a question)"
+                },
+                {
+                    "name": "Rat's Arse",
+                    "url": "/ratsarse/:from",
+                    "function_name": "ratsarse",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "I don't give a rat's arse."
+                },
+                {
+                    "name": "Retard",
+                    "url": "/retard/:from",
+                    "function_name": "retard",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "You Fucktard!"
+                },
+                {
+                    "name": "Rockstar",
+                    "url": "/rockstar/:name/:from",
+                    "function_name": "rockstar",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, you're a fucking Rock Star!"
+                },
+                {
+                    "name": "RTFM",
+                    "url": "/rtfm/:from",
+                    "function_name": "rtfm",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Read the fucking manual!"
+                },
+                {
+                    "name": "sake",
+                    "url": "/sake/:from",
+                    "function_name": "sake",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "For Fuck's sake!"
+                },
+                {
+                    "name": "Shakespeare",
+                    "url": "/shakespeare/:name/:from",
+                    "function_name": "shakespeare",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, Thou clay-brained guts, thou knotty-pated fool, thou whoreson obscene greasy tallow-catch!"
+                },
+                {
+                    "name": "Shut Up",
+                    "url": "/shutup/:name/:from",
+                    "function_name": "shutup",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, shut the fuck up."
+                },
+                {
+                    "name": "Single",
+                    "url": "/single/:from",
+                    "function_name": "single",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Not a single fuck was given."
+                },
+                {
+                    "name": "Thanks",
+                    "url": "/thanks/:from",
+                    "function_name": "thanks",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck you very much."
+                },
+                {
+                    "name": "That's fucking ridiculous",
+                    "url": "/ridiculous/:from",
+                    "function_name": "ridiculous",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "That's fucking ridiculous"
+                },
+                {
+                    "name": "Thinking",
+                    "url": "/thinking/:name/:from",
+                    "function_name": "thinking",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, what the fuck were you actually thinking?"
+                },
+                {
+                    "name": "This Guy",
+                    "url": "/thumbs/:name/:from",
+                    "function_name": "thumbs",
+                    "parameters": [
+                        { "name": "From", "field": "from" },
+                        { "name": "Name", "field": "name" }
+                    ],
+                    "message": "Who has two thumbs and doesn't give a fuck? :name."
+                },
+                {
+                    "name": "This Thing In Particular",
+                    "url": "/particular/:thing/:from",
+                    "function_name": "particular",
+                    "parameters": [
+                        { "name": "Thing", "field": "thing" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck this :thing in particular."
+                },
+                {
+                    "name": "Too",
+                    "url": "/too/:from",
+                    "function_name": "too",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Thanks, fuck you too."
+                },
+                {
+                    "name": "Tucker",
+                    "url": "/tucker/:from",
+                    "function_name": "tucker",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Come the fuck in or fuck the fuck off."
+                },
+                {
+                    "name": "understand",
+                    "url": "/understand/:name/:from",
+                    "function_name": "understand",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Listen here :name!  What part of 'Fuck Off' don't you understand?"
+                },
+                {
+                    "name": "Version",
+                    "url": "/version",
+                    "function_name": "version",
+                    "parameters": [],
+                    "message": "Version :version"
+                },
+                {
+                    "name": "Waste",
+                    "url": "/waste/:name/:from",
+                    "function_name": "waste",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "I don't waste my fucking time with your bullshit :name!"
+                },
+                {
+                    "name": "What",
+                    "url": "/what/:from",
+                    "function_name": "what",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "What the fuck‽"
+                },
+                {
+                    "name": "Xmas",
+                    "url": "/xmas/:name/:from",
+                    "function_name": "xmas",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Merry Fucking Christmas, :name."
+                },
+                {
+                    "name": "Yeah",
+                    "url": "/yeah/:from",
+                    "function_name": "yeah",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Fuck YEAH!"
+                },
+                {
+                    "name": "Yoda",
+                    "url": "/yoda/:name/:from",
+                    "function_name": "yoda",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": "Fuck off, you must, :name."
+                },
+                {
+                    "name": "You Think",
+                    "url": "/think/:name/:from",
+                    "function_name": "think",
+                    "parameters": [
+                        { "name": "Name", "field": "name" },
+                        { "name": "From", "field": "from" }
+                    ],
+                    "message": ":name, you think I give a fuck?"
+                },
+                {
+                    "name": "Zayn",
+                    "url": "/zayn/:from",
+                    "function_name": "zayn",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Ask me if I give a motherfuck ?!!"
+                },
+                {
+                    "name": "Zero",
+                    "url": "/zero/:from",
+                    "function_name": "zero",
+                    "parameters": [{ "name": "From", "field": "from" }],
+                    "message": "Zero, that's the number of fucks I give."
+                }
+            ];
+        document.addEventListener('DOMContentLoaded', () => {
+                    operations.forEach(op => {
+                        console.log(op.message)
+                        const tbody = document.querySelector('#ops-table tbody');
+                        const tr = document.createElement('tr');
+
+                        // Name Column
+                        const nameTd = document.createElement('td');
+                        nameTd.textContent = op.name;
+                        tr.appendChild(nameTd);
+
+                        // Message Column
+                        const messageTd = document.createElement('td');
+                        messageTd.textContent = op.message;
+                        tr.appendChild(messageTd);
+
+                        // Parameters Column
+                        const paramsTd = document.createElement('td');
+                        const inputs = {};
+
+                        if (op.parameters && op.parameters.length) {
+                            op.parameters.forEach(param => {
+                                const div = document.createElement('div');
+                                div.className = 'param-row';
+                                
+                                const label = document.createElement('label');
+                                label.textContent = param.name;
+                                div.appendChild(label);
+
+                                const input = document.createElement('input');
+                                input.type = 'text';
+                                input.placeholder = param.name;
+                                input.dataset.field = param.field;
+                                div.appendChild(input);
+
+                                inputs[param.field] = input;
+                                paramsTd.appendChild(div);
+                            });
+                        } else {
+                            paramsTd.textContent = 'No parameters';
+                        }
+                        tr.appendChild(paramsTd);
+
+                        // URL Column
+                        const urlTd = document.createElement('td');
+                        const link = document.createElement('a');
+                        link.className = 'api-link';
+                        link.target = '_blank';
+                        urlTd.appendChild(link);
+                        tr.appendChild(urlTd);
+
+                        // Update Logic
+                        const updateUrl = () => {
+                            const url = new URL(window.location.origin + '/api/foaas');
+                            url.searchParams.set('function', op.function_name);
+
+                            if (op.parameters) {
+                                op.parameters.forEach(param => {
+                                    const input = inputs[param.field];
+                                    const val = input ? input.value.trim() : '';
+                                    if (val) url.searchParams.set(param.field, val);
+                                });
+                            }
+                            
+                            const fullUrl = url.href;
+                            link.href = fullUrl;
+                            link.textContent = fullUrl;
+                        };
+
+                        // Bind events
+                        Object.values(inputs).forEach(input => {
+                            input.addEventListener('keyup', updateUrl);
+                            input.addEventListener('change', updateUrl);
+                        });
+
+                        // Initial call
+                        updateUrl();
+
+                        tbody.appendChild(tr);
+                    });
+                });
+    </script>
+</body>
+</html>

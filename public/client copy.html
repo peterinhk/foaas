@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOAAS Operations Client</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 20px; color: #333; }
+        h1 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #f8f8f8; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .param-row { margin-bottom: 8px; }
+        .param-row label { display: inline-block; width: 100px; font-weight: 500; }
+        .param-row input { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
+        a.api-link { color: #007bff; text-decoration: none; word-break: break-all; font-family: monospace; }
+        a.api-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>FOAAS Operations Client</h1>
+    <p>Test the Fuck Off As A Service API operations below.</p>
+
+    <table id="ops-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Function Name</th>
+                <th style="width: 30%;">Message Template</th>
+                <th style="width: 25%;">Parameters</th>
+                <th style="width: 25%;">Generated URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="4">Loading operations...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/public/operations.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load operations.json');
+                    return response.json();
+                })
+                .then(operations => {
+                    const tbody = document.querySelector('#ops-table tbody');
+                    tbody.innerHTML = '';
+
+                    operations.forEach(op => {
+                        const tr = document.createElement('tr');
+
+                        // Name Column
+                        const nameTd = document.createElement('td');
+                        nameTd.textContent = op.name;
+                        tr.appendChild(nameTd);
+
+                        // Message Column
+                        const messageTd = document.createElement('td');
+                        messageTd.textContent = op.message;
+                        tr.appendChild(messageTd);
+
+                        // Parameters Column
+                        const paramsTd = document.createElement('td');
+                        const inputs = {};
+
+                        if (op.parameters && op.parameters.length) {
+                            op.parameters.forEach(param => {
+                                const div = document.createElement('div');
+                                div.className = 'param-row';
+                                
+                                const label = document.createElement('label');
+                                label.textContent = param.name;
+                                div.appendChild(label);
+
+                                const input = document.createElement('input');
+                                input.type = 'text';
+                                input.placeholder = param.name;
+                                input.dataset.field = param.field;
+                                div.appendChild(input);
+
+                                inputs[param.field] = input;
+                                paramsTd.appendChild(div);
+                            });
+                        } else {
+                            paramsTd.textContent = 'No parameters';
+                        }
+                        tr.appendChild(paramsTd);
+
+                        // URL Column
+                        const urlTd = document.createElement('td');
+                        const link = document.createElement('a');
+                        link.className = 'api-link';
+                        link.target = '_blank';
+                        urlTd.appendChild(link);
+                        tr.appendChild(urlTd);
+
+                        // Update Logic
+                        const updateUrl = () => {
+                            const url = new URL(window.location.origin + '/api/foaas');
+                            url.searchParams.set('function', op.function_name);
+
+                            if (op.parameters) {
+                                op.parameters.forEach(param => {
+                                    const input = inputs[param.field];
+                                    const val = input ? input.value.trim() : '';
+                                    if (val) url.searchParams.set(param.field, val);
+                                });
+                            }
+                            
+                            const fullUrl = url.href;
+                            link.href = fullUrl;
+                            link.textContent = fullUrl;
+                        };
+
+                        // Bind events
+                        Object.values(inputs).forEach(input => {
+                            input.addEventListener('keyup', updateUrl);
+                            input.addEventListener('change', updateUrl);
+                        });
+
+                        // Initial call
+                        updateUrl();
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    document.querySelector('#ops-table tbody').innerHTML = 
+                        `<tr><td colspan="4" style="color: red;">Error: ${err.message}</td></tr>`;
+                });
+        });
+    </script>
+</body>
+</html>
